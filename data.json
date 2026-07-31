@@ -1,0 +1,127 @@
+
+{
+    "tiktok": [
+        {
+            "name": "sessionid",
+            "value": "",
+            "domain": ".tiktok.com",
+            "hostOnly": false,
+            "path": "/",
+            "secure": true,
+            "httpOnly": true,
+            "sameSite": null,
+            "session": false,
+            "firstPartyDomain": "",
+            "partitionKey": null,
+            "expirationDate": 1801057719.042,
+            "storeId": null
+        },
+        {
+            "name": "odin_tt",
+            "value": "",
+            "domain": ".tiktok.com",
+            "hostOnly": false,
+            "path": "/",
+            "secure": false,
+            "httpOnly": true,
+            "sameSite": null,
+            "session": false,
+            "firstPartyDomain": "",
+            "partitionKey": null,
+            "expirationDate": 1817047085.455,
+            "storeId": null
+        },
+        {
+            "name": "multi_sids",
+            "value": "",
+            "domain": ".tiktok.com",
+            "hostOnly": false,
+            "path": "/",
+            "secure": true,
+            "httpOnly": true,
+            "sameSite": null,
+            "session": false,
+            "firstPartyDomain": "",
+            "partitionKey": null,
+            "expirationDate": 1790689719.042,
+            "storeId": null
+        },
+        {
+            "name": "passport_auth_status",
+            "value": "",
+            "domain": ".tiktok.com",
+            "hostOnly": false,
+            "path": "/",
+            "secure": false,
+            "httpOnly": true,
+            "sameSite": null,
+            "session": false,
+            "firstPartyDomain": "",
+            "partitionKey": null,
+            "expirationDate": 1788097719.042,
+            "storeId": null
+        }
+    ],
+    "youtube": [
+        {
+            "name": "SID",
+            "value": "",
+            "hostOnly": false,
+            "path": "/",
+            "secure": false,
+            "httpOnly": false,
+            "sameSite": null,
+            "session": false,
+            "firstPartyDomain": "",
+            "partitionKey": null,
+            "expirationDate": 1819850381.642,
+            "storeId": null
+        },
+        {
+            "name": "HSID",
+            "value": "",
+            "domain": ".youtube.com",
+            "hostOnly": false,
+            "path": "/",
+            "secure": false,
+            "httpOnly": true,
+            "sameSite": null,
+            "session": false,
+            "firstPartyDomain": "",
+            "partitionKey": null,
+            "expirationDate": 1819850381.642,
+            "storeId": null
+        },
+        {
+            "name": "SSID",
+            "value": "",
+            "domain": ".youtube.com",
+            "hostOnly": false,
+            "path": "/",
+            "secure": true,
+            "httpOnly": true,
+            "sameSite": null,
+            "session": false,
+            "firstPartyDomain": "",
+            "partitionKey": null,
+            "expirationDate": 1819850381.642,
+            "storeId": null
+        },    
+        {
+            "name": "LOGIN_INFO",
+            "value": "",
+            "domain": ".youtube.com",
+            "hostOnly": false,
+            "path": "/",
+            "secure": true,
+            "httpOnly": true,
+            "sameSite": "no_restriction",
+            "session": false,
+            "firstPartyDomain": "",
+            "partitionKey": null,
+            "expirationDate": 1813739281.985,
+            "storeId": null
+        }
+    ]
+}
+
