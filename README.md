@@ -1,87 +1,81 @@
-<<<<<<< HEAD
-```markdown
-# Web DOM Hand Gesture Control with MediaPipe & Playwright (Beta Version)
+# Aunda: Web DOM Hand Gesture Control System
 
-An advanced, real-time hand gesture interaction system designed to control web browsing (TikTok, YouTube, etc.) and cursor movement using OpenCV, MediaPipe Hands, PyAutoGUI, and Playwright. 
+A real-time hand gesture interaction framework designed to control web browsers and desktop cursor navigation using computer vision and browser automation tools.
 
 ---
 
-## Demo Reference
-
-* Local Video File: `D:\Jomnes\aunda\Demo.mp4`
-
----
-
-## High-Level Architecture Flow Diagram
+## Technical Architecture Overview
 
 
 ```
 
 +-----------------------------------------------------------------------+
 |                             CAMERA INPUT                              |
-|                         (USB / Integrated WebCam)                     |
+|                       (USB / Integrated Webcam)                       |
 +-----------------------------------------------------------------------+
 |
 v
 +-----------------------------------------------------------------------+
-|                         OPENCV CAPTURE LOOP                           |
+|                          OPENCV CAPTURE LOOP                          |
 |               Captures raw frame and flips horizontally               |
 +-----------------------------------------------------------------------+
 |
 v
 +-----------------------------------------------------------------------+
 |                         MEDIAPIPE HANDS ENGINE                        |
-|             Extracts 21 3D Hand Landmarks & Normalized Coordinates    |
+|        Extracts 21 3D Hand Landmarks and Normalized Coordinates       |
 +-----------------------------------------------------------------------+
 |
 v
 +-----------------------------------------------------------------------+
-|                        ZONE & GESTURE DISPATCHER                      |
-|                  Determines Frame Spatial Location & Pose             |
+|                       ZONE & GESTURE DISPATCHER                       |
+|               Determines Frame Spatial Location and Pose              |
 +-----------------------------------------------------------------------+
-|                               |                               |
-v                               v                               v
-+--------------+               +----------------+              +--------------+
-|   TOP ZONE   |               |  MIDDLE ZONE   |              | BOTTOM ZONE  |
-| Mouse/Cursor |               | Feed Scrolling |              | Context Menu |
-+--------------+               +----------------+              +--------------+
-|                               |                               |
-| Exponential Moving            | Normalized Y-Axis             | Sub-Item     |
-| Average (EMA)                 | Delta Offset                  | Selection    |
-v                               v                               v
-+--------------+               +----------------+              +--------------+
-|  PyAutoGUI   |               | Playwright DOM |              | Playwright / |
-| Cursor Control|              | Mouse Wheel /  |              | Cookie Engine|
-|  & Clicks    |               | Keyboard Key   |              | JSON Dump    |
-+--------------+               +----------------+              +--------------+
+|
++-------------------------+-------------------------+
+|                         |                         |
+v                         v                         v
++-----------------+       +-----------------+       +-----------------+
+|    TOP ZONE     |       |   MIDDLE ZONE   |       |   BOTTOM ZONE   |
+|  Mouse / Cursor |       | Feed Scrolling  |       | Context Menu    |
++-----------------+       +-----------------+       +-----------------+
+|                         |                         |
+| Exponential Moving |   | Normalized Y-Axis |     | Sub-Item Selection |
+| Average (EMA)      |   | Delta Offset      |     | Processing       |
+v                         v                         v
++-----------------+       +-----------------+       +-----------------+
+| PyAutoGUI       |       | Playwright DOM  |       | Playwright /    |
+| Cursor Control  |       | Mouse Wheel /   |       | Cookie Engine   |
+| & Clicks        |       | Keyboard Key    |       | JSON Storage    |
++-----------------+       +-----------------+       +-----------------+
 
 ```
 
 ---
 
-## Key System Features
+## Core System Features
 
-* **Exponential Moving Average (EMA) Cursor Smoothing**: Features an ultra-smooth tracking algorithm with deadzone filtering for fluid pointer interactions without cursor jitter.
-* **Zone-Based Gesture Interface**: Splits the camera frame vertically into three dedicated functional zones (TOP, MIDDLE, BOTTOM) to isolate commands and prevent cross-triggering.
-* **State Locking Mechanism**: Implements a strict binary lock/unlock model using explicit closed fist gestures to lock active zones and prevent unintended gesture execution.
-* **Platform-Specific Navigation**: Optimized dedicated interactions for media feeds including TikTok video progression and YouTube Shorts control.
-* **Persistent Session & Cookie Engine**: Reads and updates local session state to JSON storage (`D:\Jomnes\aunda\data.json`), maintaining authenticated logins across browser restarts.
-* **Multi-Threaded Execution**: Isolates visual feedback frame rendering from Playwright browser DOM operations to guarantee low latency.
+* **Exponential Moving Average (EMA) Cursor Smoothing**: Implements a tracking algorithm with deadzone filtering to reduce coordinate jitter during precision cursor tracking.
+* **Zone-Based Spatial Interface**: Divides the video frame into three distinct functional zones (TOP, MIDDLE, BOTTOM) to prevent accidental cross-triggering of gestures.
+* **State Locking Model**: Uses an explicit closed-fist gesture to switch between Unlocked and Locked states, isolating active operations within a selected zone.
+* **Media Feed Control**: Enables vertical feed navigation designed for platforms like TikTok and YouTube Shorts.
+* **Session Persistence**: Reads and serializes browser session cookies directly to local JSON storage (`data.json`) to maintain state between executions.
+* **Multi-Threaded Execution**: Separates video frame rendering loops from browser automation calls to ensure reliable real-time performance.
 
 ---
 
-## System Requirements & Prerequisites
+## Prerequisites and System Requirements
 
 * **Operating System**: Windows 10/11, macOS, or Linux
-* **Python Runtime**: Python 3.12 (Recommended)
-* **Camera**: Standard USB Webcam or integrated laptop camera
-* **Browser Runtime**: Chromium (Managed by Playwright)
+* **Python Version**: Python 3.12 (Recommended)
+* **Hardware**: USB Webcam or integrated optical sensor
+* **Supported Browsers**: Chromium (Automated via Playwright)
 
 ---
 
-## Installation & Setup
+## Installation and Setup
 
-### 1. Create and Activate Virtual Environment
+### 1. Configure Virtual Environment
 
 **Windows (PowerShell):**
 ```powershell
@@ -98,7 +92,7 @@ source venv/bin/activate
 
 ```
 
-### 2. Install Required Dependencies
+### 2. Install Dependencies
 
 ```bash
 pip install "numpy<2.0.0" "mediapipe==0.10.14" opencv-python pyautogui playwright
@@ -114,13 +108,11 @@ playwright install chromium
 
 ---
 
-## Cookie Configuration & Storage Format
+## Cookie Configuration Schema
 
-The system persists user login sessions directly to a local JSON file.
+The system loads and serializes session authentication tokens using a localized JSON data structure.
 
-* **Default Path**: `D:\Jomnes\aunda\data.json`
-
-### JSON Schema Breakdown
+**Path**: `data.json`
 
 ```json
 {
@@ -164,152 +156,139 @@ The system persists user login sessions directly to a local JSON file.
 
 ---
 
-## System Operational Mechanics: Lock vs Unlock States
+## State Machine Mechanics
 
 ```
                  +-----------------------------------+
-                 |           UNLOCKED STATE          |
-                 | - Free zone switching             |
-                 | - Tracking active on wrist/hand   |
+                 |          UNLOCKED STATE           |
+                 | - Free spatial zone selection     |
+                 | - Tracking hand centroid location |
                  +-----------------------------------+
                                    |
                   Form Closed Fist | Form Closed Fist
                   in Target Zone   | while Locked
                                    v
                  +-----------------------------------+
-                 |            LOCKED STATE           |
-                 | - Confined to specific zone       |
-                 | - Zone actions fully executable   |
+                 |           LOCKED STATE            |
+                 | - Confined to selected zone       |
+                 | - Zone actions executable         |
                  +-----------------------------------+
 
 ```
 
-1. **UNLOCKED STATE**:
-* The system tracks hand center position across zones.
-* Actions within individual zones are disabled to prevent accidental clicks or scrolls while moving the hand.
-* Transitioning between zones dynamically highlights the targeted zone on the OpenCV display frame.
+### Unlocked State
 
+* Tracks hand movement across all zones without executing zone-specific actions.
+* Prevents unintentional mouse clicks or scroll events during transitional movements.
+* Visual indicators dynamically highlight the candidate zone on the video overlay.
 
-2. **LOCKED STATE**:
-* Initiated by forming a **Closed Fist** inside a targeted zone.
-* Locks all inputs to that zone's specific functional handler.
-* Visual indicator shifts to locked mode on screen.
-* Disables zone switching until an explicit unlock gesture (Closed Fist or Index-Thumb Pinch) is registered.
+### Locked State
 
-
+* Activated by forming a **Closed Fist** within a designated zone.
+* Binds input parsing strictly to the selected zone handler.
+* Disables zone switching until an explicit unlock gesture (**Closed Fist** or **Index-Thumb Pinch**) is recorded.
 
 ---
 
-## Comprehensive Zone Logic & Gesture Details
+## Zone Operations and Gesture Details
 
 ### 1. TOP ZONE: Mouse Cursor & Precision Pointing
 
-#### Main Purpose
+#### Purpose
 
-Maps hand movement directly to system mouse coordinates and provides left-click capabilities for general web interactions.
+Maps hand coordinates to desktop monitor coordinates and executes primary mouse clicks.
 
-#### Primary Landmarks
+#### Tracked Landmarks
 
-* **Index Fingertip** (Landmark ID: 8)
-* **Middle Fingertip** (Landmark ID: 12)
-* **Thumb Tip** (Landmark ID: 4)
+* **Index Fingertip**: Landmark ID 8
+* **Middle Fingertip**: Landmark ID 12
+* **Thumb Tip**: Landmark ID 4
 
-#### Detailed Conditions & Rules
+#### Rules
 
-* **Zone Entry & Lock**: Position hand in the top third of the viewport and close hand into a **Closed Fist**.
-* **Pointer Tracking**: Tracks Index Fingertip (Landmark 8). Converts normalized coordinates (0.0 to 1.0) into primary display pixel resolution.
-* **Smoothing Formula**: Uses Exponential Moving Average (EMA):
+* **Lock Gesture**: Position hand in the upper section and form a **Closed Fist**.
+* **Coordinate Mapping**: Tracks Landmark 8 and maps normalized coordinates $(0.0 - 1.0)$ to absolute display pixels.
+* **Coordinate Smoothing Formula**:
 
 $$x_{\text{smooth}} = \alpha \cdot x_{\text{raw}} + (1 - \alpha) \cdot x_{\text{prev}}$$
 
-
-
-Where $\alpha$ (Alpha) controls responsiveness versus jitter reduction.
-* **Left Mouse Click**: Pinch **Index Fingertip** (Landmark 8) and **Middle Fingertip** (Landmark 12) together below a Euclidean distance threshold of 0.04 normalized units.
-* **Unlock Condition**: Form a **Closed Fist** or perform an **Index-Thumb Pinch**.
+* **Left Click**: Pinch **Index Fingertip** (Landmark 8) and **Middle Fingertip** (Landmark 12) below a distance threshold of $0.04$ normalized units.
+* **Unlock**: Form a **Closed Fist** or execute an **Index-Thumb Pinch**.
 
 ---
 
-### 2. MIDDLE ZONE: Media Feed Scrolling (TikTok & YouTube Shorts)
+### 2. MIDDLE ZONE: Media Feed Navigation
 
-#### Main Purpose
+#### Purpose
 
-Delivers vertical scroll inputs tailored for short-form video feeds like TikTok and YouTube Shorts.
+Generates vertical scrolling events for short-form media platforms (TikTok and YouTube Shorts).
 
-#### Primary Landmarks
+#### Tracked Landmarks
 
-* **Index Fingertip** (Landmark ID: 8)
-* **Middle Fingertip** (Landmark ID: 12)
-* **Wrist Point** (Landmark ID: 0)
+* **Index Fingertip**: Landmark ID 8
+* **Middle Fingertip**: Landmark ID 12
+* **Wrist Point**: Landmark ID 0
 
-#### Detailed Conditions & Rules
+#### Rules
 
-* **Zone Entry & Lock**: Position hand in the central horizontal region of the frame and form a **Closed Fist**.
-* **Scroll Trigger Pose**: Extend **Index and Middle Fingers** upward while keeping Ring and Pinky folded down (**Two-Finger Vertical Pose**).
-* **Scroll Up Execution**: Move extended hand upward along the camera Y-axis. Triggers Playwright page scroll up or simulates `Up Arrow` key press for YouTube Shorts / TikTok previous video.
-* **Scroll Down Execution**: Move extended hand downward along the Y-axis. Triggers Playwright page scroll down or simulates `Down Arrow` key press for YouTube Shorts / TikTok next video.
-* **Invert Scroll Vector**: Perform an **Index-Thumb Pinch** to switch scroll direction logic (Normal vs Inverted).
-* **Unlock Condition**: Form a **Closed Fist**.
-
----
-
-### 3. BOTTOM ZONE: Navigation Menu & Cookie Manager
-
-#### Main Purpose
-
-Interactive menu overlay allowing real-time URL switching between YouTube and TikTok, plus explicit trigger points for cookie persistence.
-
-#### Sub-Menu Items
-
-1. `1: YOUTUBE` -> Navigates Playwright instance to `https://www.youtube.com`
-2. `2: TIKTOK` -> Navigates Playwright instance to `https://www.tiktok.com`
-3. `3: SAVE COOKIE` -> Serializes current context from cookie editor extension into `data.json`
-4. `4: PT4` -> Reserved action hook
-5. `5: CANCEL` -> Exits menu without executing actions
-
-#### Detailed Conditions & Rules
-
-* **Zone Entry & Lock**: Move hand to the lower third of the screen frame and form a **Closed Fist**.
-* **Cycle Options**: Perform an **Index-Thumb Pinch** (Landmark 4 to Landmark 8 contact) to cycle sequentially through items 1 through 5.
-* **Confirm Option**: Form a **Closed Fist** to execute the currently highlighted menu choice.
-* **Unlock Condition**: Form a **Closed Fist** on option `5: CANCEL` or complete any menu command execution.
+* **Lock Gesture**: Position hand in the center region and form a **Closed Fist**.
+* **Scroll Pose**: Extend Index and Middle fingers vertically (**Two-Finger Pose**).
+* **Scroll Up**: Move extended hand upward along the Y-axis (Triggers previous item / `Up Arrow`).
+* **Scroll Down**: Move extended hand downward along the Y-axis (Triggers next item / `Down Arrow`).
+* **Invert Scroll Vector**: Perform an **Index-Thumb Pinch** to reverse directional tracking.
+* **Unlock**: Form a **Closed Fist**.
 
 ---
 
-## Keyboard Control Matrix
+### 3. BOTTOM ZONE: Navigation & Storage Management
 
-| Key Command | Executed Function |
+#### Purpose
+
+Provides an interactive menu for switching URLs and triggering cookie serialization routines.
+
+#### Menu Options
+
+1. `1: YOUTUBE` -> Navigates browser to `https://www.youtube.com`
+2. `2: TIKTOK` -> Navigates browser to `https://www.tiktok.com`
+3. `3: SAVE COOKIE` -> Serializes browser context cookies to `data.json`
+4. `4: PT4` -> Unassigned hook
+5. `5: CANCEL` -> Exits menu structure
+
+#### Rules
+
+* **Lock Gesture**: Move hand to the bottom third of the frame and form a **Closed Fist**.
+* **Cycle Option**: Perform an **Index-Thumb Pinch** to advance through menu options.
+* **Confirm Selection**: Form a **Closed Fist** to execute the targeted option.
+* **Unlock**: Confirm `5: CANCEL` or complete a menu action.
+
+---
+
+## Keyboard Reference
+
+| Key | Execution Command |
 | --- | --- |
-| **Q** | Closes OpenCV video feed, shuts down Playwright browser context, and safely exits process. |
-| **R** | Clears EMA coordinate history buffer and resets hand tracking system state. |
+| **Q** | Terminates OpenCV capture loop, closes Playwright browser instance, and exits. |
+| **R** | Clears EMA coordinate buffers and resets tracking states. |
 
 ---
-
-## Acknowledgements
-
-* **Architecture & Code Generation**: Built with AI collaboration for code structuring, MediaPipe pipeline design, and multi-threading logic.
-* **Libraries**: OpenCV, MediaPipe, Playwright, PyAutoGUI.
 
 ## Running the Application
 
-Launch the main controller script
+Execute the primary runtime script:
 
 ```bash
-python main.py
+python aunda.py
+
+```
 
 ---
-[!NOTE]
-**Project Status & Acknowledgements**
 
-Designed, architected, and tested by **Im Boravath**. Code generation, algorithm optimization, and boilerplate implementation were built in collaboration with AI assistance.
- 
-*Current version (`v0.9.0-beta`) is a proof-of-concept and does not yet fully support automatic cookie/session extraction.*
+## Project Status and Acknowledgements
 
-```
+* **System Design & Architecture**: Im Boravath
+* **Implementation & Optimization**: Built using AI-assisted pair-programming for boilerplate generation, MediaPipe pipeline structuring, and multithreading implementation.
+* **Project Version**: `v0.9.0-beta` (Proof of Concept)
 
-```
+> **Note**: *Automatic extraction and authorization of cookie/session objects are under development and may require manual configuration.*
 
 ```
-=======
-# Aunda
->>>>>>> 002bc89d471db48c85d68ecdf9ffde3694fca153
